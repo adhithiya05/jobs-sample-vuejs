@@ -64,26 +64,6 @@
             <a :href="data.item.applylink">Apply</a>
           </template>
         </b-table>
-        <!-- <table class="table table-bordered user-table">
-          <thead class="thead-light">
-            <tr>
-              <th class>Title</th>
-              <th class="ds-none ds-sm-tb-cell">Profile Picture</th>
-              <th class="ds-none ds-lg-tb-cell">First Name</th>
-              <th class="ds-none ds-lg-tb-cell">Last Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="user in users" :key="user.id" transition="item">
-              <td>{{ user.title }}</td>
-              <td class="ds-none ds-sm-tb-cell">
-                <img :src="user.avatar" alt>
-              </td>
-              <td class="ds-none ds-lg-tb-cell">{{ user.first_name }}</td>
-              <td class="ds-none ds-lg-tb-cell">{{ user.last_name }}</td>
-            </tr>
-          </tbody>
-        </table>-->
       </div>
       <div class="col-12">
         <b-pagination
@@ -196,32 +176,6 @@ export default {
 th,
 td {
   vertical-align: middle;
-}
-
-/* responsive-classes */
-.ds-none {
-  display: none;
-}
-
-/* ipad */
-@media (min-width: 576px) {
-  .ds-sm-tb-cell {
-    display: table-cell;
-  }
-}
-
-/* laptop */
-@media (min-width: 992px) {
-  .ds-lg-tb-cell {
-    display: table-cell;
-  }
-}
-
-/* ipad view */
-@media (min-width: 576px) {
-  .d-tb-large {
-    display: table-cell;
-  }
 }
 
 /* transition */
