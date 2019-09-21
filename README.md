@@ -30,5 +30,7 @@ npm run lint
 npm run test:unit
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Assumptions
+```
+1. Add a filter that shows only expired jobs
+```
