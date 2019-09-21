@@ -167,13 +167,17 @@ export default {
       searchResultCount: 0
     };
   },
-  created() {
-    axios.get(JOBS_URL).then(result => {
-        const res = result.data
-        this.jobs = res.data
-        this.totalJobs = res.len
-      }).catch(err => console.log(err))
-      .finally(() => this.loading = false)
+  async created() {
+    try {
+      const res = await axios.get(JOBS_URL)
+      const jobs = res.data
+      this.jobs = jobs.data
+      this.totalJobs = jobs.len
+    } catch (err) {
+      console.log(err)
+    } finally {
+      this.loading = false
+    }
   },
   methods: {
     onFiltered(data, n) {
