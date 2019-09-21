@@ -5,7 +5,7 @@
         <h3>Jobs</h3>
       </div>
       <div class="col-12">
-        <p>Total Jobs: {{ users.length }}</p>
+        <p>Total Jobs: {{ getJobs.length }}</p>
       </div>
       <b-col lg="6" class="my-1">
         <b-form-group
@@ -50,9 +50,22 @@
           </b-form-checkbox-group>
         </b-form-group>
       </b-col>
-      <div class="col-12">
+      <b-col>
+       <b-form-checkbox
+      v-model="showExpired"
+      name="checkbox1"
+      :value="true"
+      :unchecked-value="false"
+    >
+      Show Expired Jobs
+        </b-form-checkbox>
+      </b-col>
+      <div v-if="loading" class="col-12 justify-content-center">
+        <b-spinner style="width: 3rem; height: 3rem;" label="Large Spinner"></b-spinner>
+      </div>
+      <div class="col-12" v-else>
         <b-table
-          :items="users"
+          :items="getJobs"
           :fields="fields"
           :per-page="perPage"
           :current-page="currentPage"
@@ -60,15 +73,19 @@
           :filterIncludedFields="filterOn"
           @filtered="onFiltered"
         >
+          <template v-slot:cell(startdate)="data">
+            <p>{{ data.item.startdate ? dateFormat(data.item.startdate) : '-' }}</p>
+          </template>
+          <template v-slot:cell(enddate)="data">
+            <p>{{ data.item.enddate ? dateFormat(data.item.enddate) : '-' }}</p>
+          </template>
           <template v-slot:cell(applylink)="data">
             <a :href="data.item.applylink">Apply</a>
           </template>
         </b-table>
-      </div>
-      <div class="col-12">
         <b-pagination
           v-model="currentPage"
-          :total-rows="totalUsers"
+          :total-rows="totalJobs"
           :per-page="perPage"
           aria-controls="jobs-table"
           align="center"
@@ -79,17 +96,22 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios"
+
+const JOBS_URL = process.env.VUE_APP_JOBSURL
 
 export default {
   name: 'JobsTable',
   data() {
     return {
       id: 1,
-      users: [],
+      jobs: [],
+      showExpired: false,
+      expiredJobs: [],
       currentPage: 1,
       perPage: 10,
-      totalUsers: 0,
+      totalJobs: 0,
+      loading: true,
       fields: [
         {
           key: "title",
@@ -146,30 +168,39 @@ export default {
     };
   },
   created() {
-    this.getData();
+    axios.get(JOBS_URL).then(result => {
+        const res = result.data
+        this.jobs = res.data
+        this.totalJobs = res.len
+      }).catch(err => console.log(err))
+      .finally(() => this.loading = false)
   },
   methods: {
-    getData() {
-      axios.get("https://nut-case.s3.amazonaws.com/jobs.json").then(result => {
-        const res = result.data;
-        this.users = res.data;
-        this.totalUsers = res.len;
-      });
-    },
-    showExpiredJobs() {
-      const currentTime = +new Date();
-      this.users = this.users.filter(x => x.timestamp * 1000 < currentTime);
-    },
     onFiltered(data, n) {
       this.searchResultCount = n;
+    },
+    dateFormat(str) {
+      const dateStr = new Date(str)
+      return dateStr.toLocaleDateString()
     }
   },
   computed: {
-    expiredFilter() {
-      return this.showExpiredJobs;
+    getJobs() {
+      return this.showExpired ? this.getExpiredJobs : this.jobs
+    },
+    // since this is a computed function result of the function is cached
+    // after the first call result is returned without computation if there is no change in data
+    getExpiredJobs() {
+      const currentTime = +new Date()
+      return this.jobs.filter(x => {
+        if (x.enddate) {
+          const date = new Date(x.enddate)
+          return date.getTime() < currentTime
+        }
+      })
     }
   }
-};
+}
 </script>
 
 <style>
